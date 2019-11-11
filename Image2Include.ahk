@@ -34,10 +34,10 @@ If (hBitmap)
 ; ----------------------------------------------------------------------------------------------------------------------
 Footer1 := "
 (Join`r`n
-If !DllCall(""Crypt32.dll\CryptStringToBinary"", Ptr, &B64, ""UInt"", 0, ""UInt"", 0x01, Ptr, 0, ""UIntP"", DecLen, Ptr, 0, Ptr, 0)
+If !DllCall(""Crypt32.dll\CryptStringToBinary"" (A_IsUnicode ? ""W"" : ""A""), Ptr, &B64, ""UInt"", 0, ""UInt"", 0x01, Ptr, 0, ""UIntP"", DecLen, Ptr, 0, Ptr, 0)
    Return False
 VarSetCapacity(Dec, DecLen, 0)
-If !DllCall(""Crypt32.dll\CryptStringToBinary"", Ptr, &B64, ""UInt"", 0, ""UInt"", 0x01, Ptr, &Dec, ""UIntP"", DecLen, Ptr, 0, Ptr, 0)
+If !DllCall(""Crypt32.dll\CryptStringToBinary"" (A_IsUnicode ? ""W"" : ""A""), Ptr, &B64, ""UInt"", 0, ""UInt"", 0x01, Ptr, &Dec, ""UIntP"", DecLen, Ptr, 0, Ptr, 0)
    Return False
 ; Bitmap creation adopted from ""How to convert Image data (JPEG/PNG/GIF) to hBITMAP?"" by SKAN
 ; -> http://www.autohotkey.com/board/topic/21213-how-to-convert-image-data-jpegpnggif-to-hbitmap/?p=139257

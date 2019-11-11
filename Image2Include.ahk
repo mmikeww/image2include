@@ -24,6 +24,8 @@ Header1 := "
 ; ----------------------------------------------------------------------------------------------------------------------
 Header2 := "
 (Join`r`n
+Ptr := A_IsUnicode ? ""Ptr"" : ""UInt""
+UPtr := A_IsUnicode ? ""UPtr"" : ""UInt""
 If (NewHandle)
    hBitmap := 0
 If (hBitmap)
@@ -32,30 +34,31 @@ If (hBitmap)
 ; ----------------------------------------------------------------------------------------------------------------------
 Footer1 := "
 (Join`r`n
-If !DllCall(""Crypt32.dll\CryptStringToBinary"", ""Ptr"", &B64, ""UInt"", 0, ""UInt"", 0x01, ""Ptr"", 0, ""UIntP"", DecLen, ""Ptr"", 0, ""Ptr"", 0)
+If !DllCall(""Crypt32.dll\CryptStringToBinary"", Ptr, &B64, ""UInt"", 0, ""UInt"", 0x01, Ptr, 0, ""UIntP"", DecLen, Ptr, 0, Ptr, 0)
    Return False
 VarSetCapacity(Dec, DecLen, 0)
-If !DllCall(""Crypt32.dll\CryptStringToBinary"", ""Ptr"", &B64, ""UInt"", 0, ""UInt"", 0x01, ""Ptr"", &Dec, ""UIntP"", DecLen, ""Ptr"", 0, ""Ptr"", 0)
+If !DllCall(""Crypt32.dll\CryptStringToBinary"", Ptr, &B64, ""UInt"", 0, ""UInt"", 0x01, Ptr, &Dec, ""UIntP"", DecLen, Ptr, 0, Ptr, 0)
    Return False
 ; Bitmap creation adopted from ""How to convert Image data (JPEG/PNG/GIF) to hBITMAP?"" by SKAN
 ; -> http://www.autohotkey.com/board/topic/21213-how-to-convert-image-data-jpegpnggif-to-hbitmap/?p=139257
-hData := DllCall(""Kernel32.dll\GlobalAlloc"", ""UInt"", 2, ""UPtr"", DecLen, ""UPtr"")
-pData := DllCall(""Kernel32.dll\GlobalLock"", ""Ptr"", hData, ""UPtr"")
-DllCall(""Kernel32.dll\RtlMoveMemory"", ""Ptr"", pData, ""Ptr"", &Dec, ""UPtr"", DecLen)
-DllCall(""Kernel32.dll\GlobalUnlock"", ""Ptr"", hData)
-DllCall(""Ole32.dll\CreateStreamOnHGlobal"", ""Ptr"", hData, ""Int"", True, ""PtrP"", pStream)
-hGdip := DllCall(""Kernel32.dll\LoadLibrary"", ""Str"", ""Gdiplus.dll"", ""UPtr"")
+hData := DllCall(""Kernel32.dll\GlobalAlloc"", ""UInt"", 2, UPtr, DecLen, UPtr)
+pData := DllCall(""Kernel32.dll\GlobalLock"", Ptr, hData, UPtr)
+DllCall(""Kernel32.dll\RtlMoveMemory"", Ptr, pData, Ptr, &Dec, UPtr, DecLen)
+DllCall(""Kernel32.dll\GlobalUnlock"", Ptr, hData)
+DllCall(""Ole32.dll\CreateStreamOnHGlobal"", Ptr, hData, ""Int"", True, Ptr ""P"", pStream)
+hGdip := DllCall(""Kernel32.dll\LoadLibrary"", ""Str"", ""Gdiplus.dll"", UPtr)
 VarSetCapacity(SI, 16, 0), NumPut(1, SI, 0, ""UChar"")
-DllCall(""Gdiplus.dll\GdiplusStartup"", ""PtrP"", pToken, ""Ptr"", &SI, ""Ptr"", 0)
-DllCall(""Gdiplus.dll\GdipCreateBitmapFromStream"",  ""Ptr"", pStream, ""PtrP"", pBitmap)
+DllCall(""Gdiplus.dll\GdiplusStartup"", Ptr ""P"", pToken, Ptr, &SI, Ptr, 0)
+DllCall(""Gdiplus.dll\GdipCreateBitmapFromStream"",  Ptr, pStream, Ptr ""P"", pBitmap)
 )"
 ; ----------------------------------------------------------------------------------------------------------------------
 Footer2 := "
 (Join`r`n
-DllCall(""Gdiplus.dll\GdipDisposeImage"", ""Ptr"", pBitmap)
-DllCall(""Gdiplus.dll\GdiplusShutdown"", ""Ptr"", pToken)
-DllCall(""Kernel32.dll\FreeLibrary"", ""Ptr"", hGdip)
-DllCall(NumGet(NumGet(pStream + 0, 0, ""UPtr"") + (A_PtrSize * 2), 0, ""UPtr""), ""Ptr"", pStream)
+DllCall(""Gdiplus.dll\GdipDisposeImage"", Ptr, pBitmap)
+DllCall(""Gdiplus.dll\GdiplusShutdown"", Ptr, pToken)
+DllCall(""Kernel32.dll\FreeLibrary"", Ptr, hGdip)
+PtrSize := A_PtrSize ? A_PtrSize : 4
+DllCall(NumGet(NumGet(pStream + 0, 0, UPtr) + (PtrSize * 2), 0, UPtr), Ptr, pStream)
 Return hBitmap
 }
 )"
@@ -167,7 +170,7 @@ Convert:
    PartLength := 16000
    CharsRead  := 1
    File := FileOpen(OutFile, "w", "UTF-8")
-   File.Write(Header1 . "`r`nCreate_" . ImgName . "(NewHandle := False) {`r`n")
+   File.Write(Header1 . "`r`nCreate_" . ImgName . "(NewHandle = False) {`r`n")
    If (CreateOnLoad)
       File.Write("Static hBitmap := Create_" . ImgName . "()`r`n")
    Else
@@ -183,9 +186,9 @@ Convert:
    }
    File.Write(Footer1 . "`r`n")
    If (ReturnHICON)
-      File.Write("DllCall(""Gdiplus.dll\GdipCreateHICONFromBitmap"", ""Ptr"", pBitmap, ""PtrP"", hBitmap, ""UInt"", 0)`r`n")
+      File.Write("DllCall(""Gdiplus.dll\GdipCreateHICONFromBitmap"", Ptr, pBitmap, Ptr ""P"", hBitmap, ""UInt"", 0)`r`n")
    Else
-      File.Write("DllCall(""Gdiplus.dll\GdipCreateHBITMAPFromBitmap"", ""Ptr"", pBitmap, ""PtrP"", hBitmap, ""UInt"", 0)`r`n")
+      File.Write("DllCall(""Gdiplus.dll\GdipCreateHBITMAPFromBitmap"", Ptr, pBitmap, Ptr ""P"", hBitmap, ""UInt"", 0)`r`n")
    File.Write(Footer2)
    File.Close()
    SB_SetText("  File " . OutFile . " successfully created!")

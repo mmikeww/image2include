@@ -1,10 +1,11 @@
 #NoEnv
-#Include CreateBitmap_ImgProps_png.ahk ; change the name to what you need
+#Include Create_shift_key_png.ahk
 SetBatchLines, -1
 T := A_TickCount
-HBITMAP := CreateBitmap_ImgProps_png() ; change the name to what you need
+HBITMAP := Create_shift_key_png() ; change the name to what you need
 H := Bitmap_GetHeight(HBITMAP)
 W := Bitmap_GetWidth(HBITMAP)
+msgbox %W%x%H%
 ; ----------------------------------------------------------------------------------------------------------------------
 Gui, Margin, 0, 0
 Gui, Add, Text, x0 y0 w%W% h%H% hwndHPic1
@@ -20,18 +21,22 @@ ExitApp
 ; Returns the width of a bitmap.
 ; ----------------------------------------------------------------------------------------------------------------------
 Bitmap_GetWidth(hBitmap) {
-   Static Size := (4 * 5) + A_PtrSize + (A_PtrSize - 4)
+   Ptr := A_IsUnicode ? "Ptr" : "UInt"
+   PtrSize := A_PtrSize ? A_PtrSize : 4
+   Size := (4 * 5) + PtrSize + (PtrSize - 4)
    VarSetCapacity(BITMAP, Size, 0)
-   DllCall("Gdi32.dll\GetObject", "Ptr", hBitmap, "Int", Size, "Ptr", &BITMAP, "Int")
+   DllCall("Gdi32.dll\GetObject", Ptr, hBitmap, "Int", Size, Ptr, &BITMAP, "Int")
    Return NumGet(BITMAP, 4, "Int")
 }
 ; ----------------------------------------------------------------------------------------------------------------------
 ; Returns the height of a bitmap.
 ; ----------------------------------------------------------------------------------------------------------------------
 Bitmap_GetHeight(hBitmap) {
-   Static Size := (4 * 5) + A_PtrSize + (A_PtrSize - 4)
+   Ptr := A_IsUnicode ? "Ptr" : "UInt"
+   PtrSize := A_PtrSize ? A_PtrSize : 4
+   Size := (4 * 5) + PtrSize + (PtrSize - 4)
    VarSetCapacity(BITMAP, Size, 0)
-   DllCall("Gdi32.dll\GetObject", "Ptr", hBitmap, "Int", Size, "Ptr", &BITMAP, "Int")
+   DllCall("Gdi32.dll\GetObject", Ptr, hBitmap, "Int", Size, Ptr, &BITMAP, "Int")
    Return NumGet(BITMAP, 8, "Int")
 }
 ; ----------------------------------------------------------------------------------------------------------------------

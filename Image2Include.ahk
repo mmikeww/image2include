@@ -24,8 +24,8 @@ Header1 := "
 ; ----------------------------------------------------------------------------------------------------------------------
 Header2 := "
 (Join`r`n
-Ptr := A_IsUnicode ? ""Ptr"" : ""UInt""
-UPtr := A_IsUnicode ? ""UPtr"" : ""UInt""
+Ptr := A_PtrSize ? ""Ptr"" : ""UInt""
+UPtr := A_PtrSize ? ""UPtr"" : ""UInt""
 If (NewHandle)
    hBitmap := 0
 If (hBitmap)
